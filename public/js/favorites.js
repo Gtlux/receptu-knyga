@@ -76,7 +76,6 @@ function handleSortChange() {
 // Iškviečiama paspaudus "🗑️ Šalinti" mygtuką.
 // ============================================================
 async function removeFavorite(favoriteId) {
-  console.log('removeFavorite iškviesta su ID:', favoriteId);
 
   try {
     // Kviečiame DELETE /api/favorites/:id
