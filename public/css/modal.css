@@ -1,0 +1,91 @@
+/* ============================================================
+   MODALŲ STILIAI (modal.css)
+   Bendri modalo stiliai + recepto detalių modalas
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h3 { font-size: 18px; font-weight: 600; }
+
+.modal-close {
+  background: none; border: none;
+  color: var(--text-secondary);
+  font-size: 28px; cursor: pointer;
+  line-height: 1;
+  transition: color var(--transition);
+}
+
+.modal-close:hover { color: var(--text-primary); }
+
+/* Didesnis modalas recepto detalėms */
+.modal-card-lg {
+  max-width: 720px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.detail-content { margin-top: 8px; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.detail-image {
+  width: 100%;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.detail-image-wrapper { border-radius: var(--radius); overflow: hidden; }
+.detail-info { display: flex; flex-direction: column; }
+.detail-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.detail-subtitle {
+  font-size: 16px; font-weight: 600;
+  margin-bottom: 12px; color: var(--accent);
+}
+
+.detail-ingredients {
+  list-style: disc; padding-left: 20px;
+  font-size: 14px; color: var(--text-secondary); line-height: 1.8;
+}
+
+.detail-ingredients li { margin-bottom: 2px; }
+.detail-instructions { margin-bottom: 20px; }
+.detail-instructions p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+.detail-video { margin-bottom: 8px; }
+
+/* Vertimo mygtuko wrapper */
+.translate-btn-wrapper { margin-bottom: 16px; display: flex; gap: 8px; align-items: center; }
+.translate-status { font-size: 13px; color: var(--text-muted); font-style: italic; }

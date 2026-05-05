@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<!-- Nurodome, kad tai HTML5 dokumentas -->
+<html lang="lt">
+<!-- lang="lt" – nurodo, kad puslapio kalba yra lietuvių -->
+
+<head>
+  <!-- meta charset – nurodome simbolių kodavimą (UTF-8 palaiko lietuviškas raides) -->
+  <meta charset="UTF-8">
+
+  <!-- meta viewport – būtinas responsive design'ui.
+       width=device-width – puslapio plotis prisitaiko prie įrenginio ekrano.
+       initial-scale=1.0 – pradinis mastelis 100%. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO: puslapio aprašymas paieškos varikliams -->
+  <meta name="description" content="Receptų Knyga – ieškokite, saugokite ir tvarkykite savo mėgstamus receptus">
+
+  <!-- Puslapio pavadinimas (matomas naršyklės tab'e) -->
+  <title>Receptų Knyga</title>
+
+  <!-- Google Fonts – importuojame "Inter" šriftą profesionaliam dizainui -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- CSS stilių failai – išskaidyti pagal paskirtį geresnei struktūrai -->
+  <!-- base.css – kintamieji, reset, baziniai stiliai -->
+  <link rel="stylesheet" href="css/base.css">
+  <!-- layout.css – header, navigacija, konteineriai -->
+  <link rel="stylesheet" href="css/layout.css">
+  <!-- components.css – mygtukai, formos, kortelės, paieška -->
+  <link rel="stylesheet" href="css/components.css">
+  <!-- modal.css – modaliniai langai (pastabos, recepto detalės) -->
+  <link rel="stylesheet" href="css/modal.css">
+  <!-- utilities.css – toast pranešimai, spinner, animacijos -->
+  <link rel="stylesheet" href="css/utilities.css">
+  <!-- responsive.css – pritaikymas tablet ir mobile ekranams -->
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+  <!-- ============================================================ -->
+  <!-- HEADER – puslapio viršutinė navigacija -->
+  <!-- ============================================================ -->
+  <header class="header" id="main-header">
+    <div class="header-container">
+      <!-- Logotipas su emoji -->
+      <div class="logo" id="logo">
+        <span class="logo-icon">🍳</span>
+        <span class="logo-text">Receptų Knyga</span>
+      </div>
+
+      <!-- Navigacija – matoma tik prisijungusiems vartotojams -->
+      <!-- Navigacija paslėpta pagal nutylėjimą – rodoma tik po prisijungimo -->
+      <nav class="nav" id="main-nav" style="display: none;">
+        <!-- Hamburger mygtukas – matomas tik mobiliuose (responsive) -->
+        <button class="hamburger" id="hamburger-btn" aria-label="Meniu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <!-- Navigacijos nuorodos -->
+        <ul class="nav-links" id="nav-links">
+          <li><a href="#" class="nav-link active" data-section="search" id="nav-search">Paieška</a></li>
+          <li><a href="#" class="nav-link" data-section="favorites" id="nav-favorites">Mėgstami</a></li>
+        </ul>
+
+        <!-- Vartotojo informacija ir atsijungimo mygtukas -->
+        <div class="user-info" id="user-info">
+          <span class="user-name" id="user-name-display"></span>
+          <button class="btn btn-logout" id="logout-btn">Atsijungti</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- AUTH SEKCIJA – prisijungimo/registracijos forma -->
+  <!-- Matoma tik kai vartotojas neprisijungęs -->
+  <!-- ============================================================ -->
+  <section class="auth-section" id="auth-section">
+    <div class="auth-container">
+      <div class="auth-card">
+        <!-- Auth kortelės viršus su pavadinimu -->
+        <div class="auth-header">
+          <h1 id="auth-title">Prisijungimas</h1>
+          <p class="auth-subtitle">Sveiki atvykę į Receptų Knygą</p>
+        </div>
+
+        <!-- Prisijungimo/registracijos forma -->
+        <form id="auth-form" class="auth-form">
+          <!-- Vartotojo vardo laukas -->
+          <div class="form-group">
+            <label for="auth-username">Vartotojo vardas</label>
+            <input type="text" id="auth-username" name="username"
+                   placeholder="Įveskite vartotojo vardą" required minlength="3">
+          </div>
+
+          <!-- Slaptažodžio laukas -->
+          <div class="form-group">
+            <label for="auth-password">Slaptažodis</label>
+            <input type="password" id="auth-password" name="password"
+                   placeholder="Įveskite slaptažodį" required minlength="4">
+          </div>
+
+          <!-- Klaidos žinutės rodymo vieta -->
+          <div class="error-message" id="auth-error"></div>
+
+          <!-- Patvirtinimo mygtukas -->
+          <button type="submit" class="btn btn-primary btn-full" id="auth-submit-btn">
+            Prisijungti
+          </button>
+        </form>
+
+        <!-- Persijungimas tarp prisijungimo ir registracijos -->
+        <div class="auth-switch">
+          <span id="auth-switch-text">Neturite paskyros?</span>
+          <a href="#" id="auth-switch-link">Registruotis</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- PAGRINDINĖ SEKCIJA – matoma tik prisijungusiems -->
+  <!-- ============================================================ -->
+  <main class="main-content" id="main-content" style="display: none;">
+
+    <!-- ======== PAIEŠKOS SEKCIJA ======== -->
+    <section class="section" id="search-section">
+      <div class="container">
+        <h2 class="section-title">Ieškoti receptų</h2>
+
+        <!-- Paieškos forma -->
+        <div class="search-bar" id="search-bar">
+          <!-- Paieškos teksto laukas -->
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Ieškokite recepto pagal pavadinimą...">
+
+          <!-- Kategorijų pasirinkimas (dropdown) -->
+          <select class="search-select" id="category-select">
+            <option value="">Visos kategorijos</option>
+            <!-- Kategorijos bus užpildytos dinamiškai iš API -->
+          </select>
+
+          <!-- Paieškos mygtukas -->
+          <button class="btn btn-primary" id="search-btn">Ieškoti</button>
+        </div>
+
+        <!-- Paieškos rezultatų grid'as -->
+        <div class="meals-grid" id="search-results">
+          <!-- Rezultatai bus įterpti dinamiškai per JavaScript -->
+          <p class="placeholder-text" id="search-placeholder">
+            Ieškokite receptų pagal pavadinimą arba kategoriją ☝️
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== MĖGSTAMŲ RECEPTŲ SEKCIJA ======== -->
+    <section class="section" id="favorites-section" style="display: none;">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Mėgstami receptai</h2>
+
+          <!-- Rūšiavimo pasirinkimas -->
+          <select class="sort-select" id="sort-select">
+            <option value="">Numatytas</option>
+            <option value="name">Pagal pavadinimą</option>
+            <option value="date">Pagal datą</option>
+          </select>
+        </div>
+
+        <!-- Mėgstamų receptų grid'as -->
+        <div class="meals-grid" id="favorites-grid">
+          <p class="placeholder-text" id="favorites-placeholder">
+            Dar neturite mėgstamų receptų. Pridėkite iš paieškos! ⭐
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODALAS – pastabų redagavimo langas -->
+  <!-- ============================================================ -->
+  <div class="modal-overlay" id="edit-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Redaguoti pastabas</h3>
+        <!-- Uždarymo mygtukas -->
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <form id="edit-form">
+        <!-- Paslėptas laukas recepto ID saugojimui -->
+        <input type="hidden" id="edit-favorite-id">
+        <div class="form-group">
+          <label for="edit-notes">Jūsų pastabos</label>
+          <textarea id="edit-notes" rows="4" placeholder="Rašykite savo pastabas apie receptą..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Išsaugoti</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- RECEPTO DETALIŲ MODALAS – pilna recepto informacija -->
+  <!-- ============================================================ -->
+  <div class="modal-overlay" id="detail-modal" style="display: none;">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <h3 id="detail-modal-title">Recepto detalės</h3>
+        <!-- Uždarymo mygtukas -->
+        <button class="modal-close" id="detail-close-btn">&times;</button>
+      </div>
+      <!-- Recepto turinys bus įterptas dinamiškai -->
+      <div class="detail-content" id="detail-content">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TOAST PRANEŠIMAI – trumpi pranešimai apačioje -->
+  <!-- ============================================================ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript failai (moduliai) -->
+  <!-- defer – laukia kol HTML pilnai užsikraus prieš vykdant JS -->
+  <!-- Failai įkraunami eilės tvarka: utils → api → auth → search → favorites → detail → app -->
+  <script src="js/utils.js?v=4" defer></script>
+  <script src="js/api.js?v=4" defer></script>
+  <script src="js/auth.js?v=4" defer></script>
+  <script src="js/search.js?v=4" defer></script>
+  <script src="js/favorites.js?v=4" defer></script>
+  <script src="js/detail.js?v=4" defer></script>
+  <script src="js/app.js?v=4" defer></script>
+</body>
+</html>

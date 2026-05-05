@@ -1,0 +1,182 @@
+/* ============================================================
+   IŠDĖSTYMO STILIAI (layout.css)
+   Šis failas apima:
+   - Header (fiksuota viršutinė juosta)
+   - Logotipą
+   - Navigaciją
+   - Vartotojo informaciją
+   - Hamburger mygtuką (mobile)
+   - Pagrindinės turinio sekcijos konteinerius
+   ============================================================ */
+
+/* ============================================================
+   HEADER – viršutinė navigacija
+   ============================================================ */
+.header {
+  /* position: fixed – header lieka viršuje net slenkant puslapį žemyn */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* z-index: 100 – header visada virš kitų elementų */
+  z-index: 100;
+  /* Glassmorphism efektas – pusiau permatomas fonas su blur */
+  background: rgba(10, 10, 15, 0.85);
+  /* backdrop-filter: blur – sulieja foną po header'iu */
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Header vidinis konteineris – riboja plotį ir centruoja */
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;          /* auto – centruoja horizontaliai */
+  padding: 0 24px;
+  height: 70px;
+  display: flex;            /* Flexbox – lanksčiai išdėsto elementus */
+  align-items: center;      /* Centruoja vertikaliai */
+  justify-content: space-between; /* Išdėsto elementus kraštais */
+}
+
+/* ============================================================
+   LOGOTIPAS
+   ============================================================ */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;               /* Tarpas tarp emoji ir teksto */
+  cursor: pointer;
+}
+
+/* Logotipo emoji – didesnis ir su hover animacija */
+.logo-icon {
+  font-size: 28px;
+  /* Sukimosi animacija hover metu (apibrėžta animations.css) */
+  transition: transform var(--transition);
+}
+
+/* Kai pelė ant logotipo – emoji pasisuka 20 laipsnių */
+.logo:hover .logo-icon {
+  transform: rotate(20deg);
+}
+
+/* Logotipo tekstas */
+.logo-text {
+  font-size: 20px;
+  font-weight: 700;         /* Bold */
+  /* Gradientinis tekstas – šiuolaikinis efektas */
+  background: linear-gradient(135deg, var(--accent), #fbbf24);
+  /* -webkit-background-clip: text – pritaiko gradientą tik tekstui */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   NAVIGACIJA
+   ============================================================ */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Navigacijos nuorodų sąrašas */
+.nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+/* Kiekviena navigacijos nuoroda */
+.nav-link {
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all var(--transition);
+  font-size: 14px;
+}
+
+/* Hover efektas – paryškina tekstą ir prideda foną */
+.nav-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Aktyvi nuoroda – rodo kurioje sekcijoje esame */
+.nav-link.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* ============================================================
+   VARTOTOJO INFORMACIJA
+   ============================================================ */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ============================================================
+   HAMBURGER MYGTUKAS (tik mobiliuose)
+   ============================================================ */
+.hamburger {
+  display: none;           /* Paslėptas desktop'e */
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Trys hamburger linijos */
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all var(--transition);
+}
+
+/* ============================================================
+   PAGRINDINĖ TURINIO SEKCIJA
+   ============================================================ */
+.main-content {
+  /* padding-top: 94px – vieta fiksuotam header'iui */
+  padding-top: 94px;
+  padding-bottom: 40px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}

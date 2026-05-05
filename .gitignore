@@ -1,0 +1,7 @@
+# Node.js priklausomybės – nereikia kelti į GitHub
+# npm install jas automatiškai atsisiųs pagal package.json
+node_modules/
+
+# OS failai
+.DS_Store
+Thumbs.db

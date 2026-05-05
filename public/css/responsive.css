@@ -1,0 +1,75 @@
+/* ============================================================
+   RESPONSIVE DESIGN (responsive.css)
+   Pritaikymas trims įrenginių tipams:
+   - Tablet (768px – 1024px)
+   - Mobile (< 768px)
+   - Mažas mobile (< 480px)
+   @media – CSS taisyklė, kuri aktyvuojasi tik nurodytam ekrano dydžiui.
+   ============================================================ */
+
+/* ============================================================
+   TABLET (768px – 1024px)
+   ============================================================ */
+@media (max-width: 1024px) {
+  .meals-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .header-container { height: 60px; }
+  .logo-text { font-size: 18px; }
+}
+
+/* ============================================================
+   MOBILE (< 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Rodome hamburger mygtuką */
+  .hamburger { display: flex; }
+
+  /* Navigacija tampa vertikaliu meniu */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 60px; left: 0; right: 0;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .nav-links.open { display: flex; }
+  .nav-link { padding: 12px 16px; width: 100%; }
+  .user-name { display: none; }
+
+  /* Paieškos juosta tampa vertikalia */
+  .search-bar { flex-direction: column; }
+
+  /* Kortelės – vienas stulpelis */
+  .meals-grid { grid-template-columns: 1fr; }
+
+  .auth-card { padding: 28px 20px; }
+  .main-content { padding-top: 80px; }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Toast centruojami */
+  .toast-container { left: 16px; right: 16px; bottom: 16px; }
+  .toast { max-width: 100%; }
+
+  /* Detalių grid – vienas stulpelis */
+  .detail-grid { grid-template-columns: 1fr; }
+  .modal-card-lg { max-height: 90vh; padding: 20px; }
+}
+
+/* ============================================================
+   MAŽAS MOBILE (< 480px)
+   ============================================================ */
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+  .section-title { font-size: 18px; }
+  .auth-header h1 { font-size: 20px; }
+}

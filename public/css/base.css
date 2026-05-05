@@ -1,0 +1,78 @@
+/* ============================================================
+   BAZINIAI STILIAI (base.css)
+   Šis failas apima:
+   - CSS kintamuosius (custom properties) – spalvų paletė
+   - Universalų reset'ą
+   - Bazinį body, nuorodų ir sąrašų stilių
+   ============================================================ */
+
+/* ============================================================
+   CSS KINTAMIEJI (Custom Properties)
+   :root – pseudo-klasė, reiškianti HTML root elementą.
+   Čia apibrėžiame spalvas, kurias naudosime visuose CSS failuose.
+   Kintamuosius galima keisti vienoje vietoje – ir pakeitimai
+   atsispindės visur, kur jie naudojami.
+   ============================================================ */
+:root {
+  /* Pagrindinės fono spalvos (tamsus režimas) */
+  --bg-primary: #0a0a0f;         /* Pagrindinis fonas – labai tamsi mėlyna */
+  --bg-secondary: #12121a;       /* Antrinis fonas – kortelėms */
+  --bg-card: #1a1a2e;            /* Kortelių fonas */
+  --bg-input: #16162a;           /* Įvesties laukų fonas */
+
+  /* Teksto spalvos */
+  --text-primary: #e8e8f0;       /* Pagrindinis tekstas – šviesiai pilkas */
+  --text-secondary: #8888a0;     /* Antrinis tekstas – pritemdytas */
+  --text-muted: #555570;         /* Dar tamsesnis tekstas */
+
+  /* Akcentinės spalvos (šiltų tonų – oranžinė/gintarinė) */
+  --accent: #f59e0b;             /* Pagrindinė akcentinė – gintarinė */
+  --accent-hover: #d97706;       /* Akcentinė hover būsenoje */
+  --accent-glow: rgba(245, 158, 11, 0.15); /* Švytėjimo efektas */
+
+  /* Papildomos spalvos */
+  --success: #10b981;            /* Sėkmės spalva – žalia */
+  --error: #ef4444;              /* Klaidos spalva – raudona */
+  --border: rgba(255, 255, 255, 0.06); /* Subtilios kraštinės */
+
+  /* Šešėliai */
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);        /* Standartinis šešėlis */
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);     /* Didelis šešėlis */
+
+  /* Suapvalinimai */
+  --radius: 12px;     /* Standartinis kampų suapvalinimas */
+  --radius-lg: 20px;  /* Didesnis suapvalinimas */
+
+  /* Perėjimai (animacijos greitis) */
+  --transition: 0.3s ease;  /* 0.3 sekundės, lengvas įsibėgėjimas ir lėtėjimas */
+}
+
+/* Universalus reset'as – pašalina naršyklės numatytąsias paraštes */
+/* box-sizing: border-box – padding ir border įskaičiuojami į plotį */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Pagrindinis body stilius */
+body {
+  /* Naudojame Inter šriftą (iš Google Fonts), jei nepavyksta – system-ui */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  /* min-height: 100vh – body užima visą ekrano aukštį */
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* Nuorodų bazinis stilius – pašaliname numatytąjį pabraukimą */
+a {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+/* Sąrašų bazinis stilius – pašaliname žymeklius */
+ul {
+  list-style: none;
+}
