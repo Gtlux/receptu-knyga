@@ -19,9 +19,9 @@ const bcrypt = require('bcryptjs');
 // JWT (JSON Web Token) – standartas saugiam duomenų perdavimui tarp serverio ir kliento.
 const jwt = require('jsonwebtoken');
 
-// Importuojame vartotojų masyvą iš duomenų saugyklos.
-// Čia bus saugomi visi registruoti vartotojai.
-const { users } = require('../data/store');
+// Importuojame PostgreSQL prisijungimo pool'ą iš duomenų saugyklos.
+// pool.query() leidžia vykdyti SQL užklausas duomenų bazėje.
+const { pool } = require('../data/store');
 
 // Importuojame slaptą raktą iš auth middleware – jis naudojamas JWT pasirašymui.
 const { SECRET } = require('../middleware/auth');
@@ -54,39 +54,44 @@ router.post('/register', async (req, res) => {
     return res.status(400).json({ error: 'Slaptažodis turi būti bent 4 simbolių' });
   }
 
-  // Tikriname ar toks vartotojo vardas jau neužregistruotas.
-  // Array.find() grąžina pirmą elementą, atitinkantį sąlygą, arba undefined.
-  const existingUser = users.find(u => u.username === username);
+  try {
+    // Tikriname ar toks vartotojo vardas jau neužregistruotas.
+    // $1 – parametrizuota reikšmė (apsauga nuo SQL injection atakų).
+    // SQL injection – ataka, kai piktavalis įterpia SQL kodą per vartotojo įvestį.
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE username = $1',
+      [username]
+    );
 
-  // Jei rastas vartotojas su tokiu pačiu vardu – grąžiname 409 Conflict klaidą.
-  if (existingUser) {
-    return res.status(409).json({ error: 'Toks vartotojo vardas jau užimtas' });
+    // rows – masyvas su rastais įrašais; jei length > 0 – vartotojas jau egzistuoja.
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ error: 'Toks vartotojo vardas jau užimtas' });
+    }
+
+    // --- SLAPTAŽODŽIO HASHINIMAS ---
+
+    // bcrypt.hash() paverčia slaptažodį į hash'ą su 10 „salt rounds".
+    // Salt – atsitiktinė reikšmė, pridedama prie slaptažodžio prieš hashavimą,
+    // kad vienodi slaptažodžiai turėtų skirtingus hash'us.
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // INSERT INTO – SQL komanda naujam įrašui pridėti į lentelę.
+    // RETURNING id – grąžina naujai sukurto įrašo ID.
+    const result = await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
+      [username, hashedPassword]
+    );
+
+    // Grąžiname 201 Created statusą – tai reiškia, kad resursas sėkmingai sukurtas.
+    res.status(201).json({
+      message: 'Registracija sėkminga!',
+      userId: result.rows[0].id
+    });
+
+  } catch (error) {
+    console.error('Registracijos klaida:', error);
+    res.status(500).json({ error: 'Serverio klaida' });
   }
-
-  // --- SLAPTAŽODŽIO HASHINIMAS ---
-
-  // bcrypt.hash() paverčia slaptažodį į hash'ą su 10 „salt rounds".
-  // Salt – atsitiktinė reikšmė, pridedama prie slaptažodžio prieš hashavimą,
-  // kad vienodi slaptažodžiai turėtų skirtingus hash'us.
-  // async/await naudojamas, nes hashavimas – asinchroninė operacija.
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Sukuriame naują vartotojo objektą su unikaliu ID.
-  // Slaptažodis saugomas tik hashuota forma – originalus niekada neišsaugomas.
-  const newUser = {
-    id: users.length + 1,
-    username: username,
-    password: hashedPassword
-  };
-
-  // Pridedame naują vartotoją į masyvą (in-memory saugykla).
-  users.push(newUser);
-
-  // Grąžiname 201 Created statusą – tai reiškia, kad resursas sėkmingai sukurtas.
-  res.status(201).json({
-    message: 'Registracija sėkminga!',
-    userId: newUser.id
-  });
 });
 
 // ============================================================
@@ -104,53 +109,60 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Įveskite vartotojo vardą ir slaptažodį' });
   }
 
-  // Ieškome vartotojo pagal vardą mūsų duomenų saugykloje.
-  const user = users.find(u => u.username === username);
+  try {
+    // Ieškome vartotojo pagal vardą duomenų bazėje.
+    // SELECT * – paima visus stulpelius iš lentelės.
+    const result = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
 
-  // Jei vartotojas nerastas – grąžiname bendrą klaidos žinutę.
-  // Saugumo sumetimais nesakome, ar blogas vardas ar slaptažodis.
-  if (!user) {
-    return res.status(401).json({ error: 'Neteisingi prisijungimo duomenys' });
+    // Jei vartotojas nerastas – grąžiname bendrą klaidos žinutę.
+    // Saugumo sumetimais nesakome, ar blogas vardas ar slaptažodis.
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Neteisingi prisijungimo duomenys' });
+    }
+
+    // Gauname rastą vartotojo objektą iš rezultatų masyvo.
+    const user = result.rows[0];
+
+    // bcrypt.compare() palygina pateiktą slaptažodį su saugomu hash'u.
+    // Grąžina true, jei slaptažodžiai sutampa; false – jei ne.
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    // Jei slaptažodis nesutampa – grąžiname tą pačią bendrą klaidą.
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Neteisingi prisijungimo duomenys' });
+    }
+
+    // --- JWT TOKENO KŪRIMAS ---
+
+    // jwt.sign() sukuria JWT tokeną su nurodytais duomenimis (payload).
+    // Payload: vartotojo id ir username – šie duomenys bus prieinami iš tokeno.
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      SECRET,
+      { expiresIn: '24h' }
+    );
+
+    // --- COOKIE NUSTATYMAS ---
+
+    // res.cookie() nustato cookie naršyklėje.
+    // httpOnly: true – cookie nepasiekiama per JavaScript (apsauga nuo XSS atakų).
+    // sameSite: 'strict' – cookie siunčiama tik tame pačiame domene (apsauga nuo CSRF).
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'strict'
+    });
+
+    // Grąžiname sėkmingo prisijungimo atsakymą su vartotojo vardu.
+    res.json({ message: 'Prisijungimas sėkmingas!', username: user.username });
+
+  } catch (error) {
+    console.error('Prisijungimo klaida:', error);
+    res.status(500).json({ error: 'Serverio klaida' });
   }
-
-  // bcrypt.compare() palygina pateiktą slaptažodį su saugomu hash'u.
-  // Grąžina true, jei slaptažodžiai sutampa; false – jei ne.
-  const passwordMatch = await bcrypt.compare(password, user.password);
-
-  // Jei slaptažodis nesutampa – grąžiname tą pačią bendrą klaidą.
-  if (!passwordMatch) {
-    return res.status(401).json({ error: 'Neteisingi prisijungimo duomenys' });
-  }
-
-  // --- JWT TOKENO KŪRIMAS ---
-
-  // jwt.sign() sukuria JWT tokeną su nurodytais duomenimis (payload).
-  // Payload: vartotojo id ir username – šie duomenys bus prieinami iš tokeno.
-  // SECRET – slaptas raktas, kuriuo pasirašomas tokenas.
-  // expiresIn: '24h' – tokenas galioja 24 valandas, po to reikia prisijungti iš naujo.
-  const token = jwt.sign(
-    { id: user.id, username: user.username },
-    SECRET,
-    { expiresIn: '24h' }
-  );
-
-  // --- COOKIE NUSTATYMAS ---
-
-  // res.cookie() nustato cookie naršyklėje.
-  // 'token' – cookie pavadinimas.
-  // token – cookie reikšmė (JWT tokenas).
-  // Opcijos:
-  //   httpOnly: true – cookie nepasiekiama per JavaScript (apsauga nuo XSS atakų).
-  //   maxAge – cookie galiojimo laikas milisekundėmis (24 val = 86400000 ms).
-  //   sameSite: 'strict' – cookie siunčiama tik tame pačiame domene (apsauga nuo CSRF).
-  res.cookie('token', token, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: 'strict'
-  });
-
-  // Grąžiname sėkmingo prisijungimo atsakymą su vartotojo vardu.
-  res.json({ message: 'Prisijungimas sėkmingas!', username: user.username });
 });
 
 // ============================================================
@@ -160,7 +172,6 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
 
   // res.clearCookie() ištrina cookie pagal pavadinimą.
-  // Naršyklė pašalina šią cookie ir nebesiųs jos su būsimomis užklausomis.
   res.clearCookie('token');
 
   // Grąžiname patvirtinimą, kad atsijungimas sėkmingas.

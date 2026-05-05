@@ -20,6 +20,10 @@ const authRoutes = require('./routes/auth');
 const mealsRoutes = require('./routes/meals');
 const favoritesRoutes = require('./routes/favorites');
 
+// Importuojame duomenų bazės inicializacijos funkciją.
+// initializeDatabase() sukuria lenteles, jei jų dar nėra.
+const { initializeDatabase } = require('./data/store');
+
 // Sukuriame Express aplikacijos objektą – tai yra mūsų serveris
 const app = express();
 
@@ -66,9 +70,20 @@ app.use('/api/favorites', favoritesRoutes);
 // app.listen() paleidžia HTTP serverį nurodytame porte.
 // Callback funkcija iškviečiama, kai serveris sėkmingai paleistas.
 // ============================================================
-app.listen(PORT, () => {
-  console.log('===========================================');
-  console.log(`  Receptų Knyga – serveris paleistas!`);
-  console.log(`  Adresas: http://localhost:${PORT}`);
-  console.log('===========================================');
-});
+// Pirma inicializuojame duomenų bazę, tada paleidžiame serverį.
+// async IIFE (Immediately Invoked Function Expression) – leidžia naudoti await.
+async function startServer() {
+  // Sukuriame lenteles duomenų bazėje (jei dar neegzistuoja)
+  await initializeDatabase();
+
+  // Paleidžiame HTTP serverį
+  app.listen(PORT, () => {
+    console.log('===========================================');
+    console.log(`  Receptų Knyga – serveris paleistas!`);
+    console.log(`  Adresas: http://localhost:${PORT}`);
+    console.log('===========================================');
+  });
+}
+
+// Kviečiame serverio paleidimo funkciją
+startServer();
