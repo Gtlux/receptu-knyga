@@ -57,6 +57,18 @@ const API = {
     return data;
   },
 
+  // Sesijos tikrinimas – GET /api/auth/me
+  // Tikrina ar cookie vis dar galioja (ar vartotojas prisijungęs).
+  // Naudojama puslapio krovimo metu.
+  checkSession: async function() {
+    const response = await fetch('/api/auth/me', {
+      credentials: 'include'
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+  },
+
   // ============================================================
   // RECEPTŲ PAIEŠKA (TheMealDB proxy)
   // ============================================================

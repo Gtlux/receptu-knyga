@@ -30,7 +30,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Pridedame click event listener'į atsijungimo mygtukui
   logoutBtn.addEventListener('click', handleLogout);
+
+  // Tikriname ar vartotojas jau prisijungęs (ar cookie vis dar galioja).
+  // Jei taip – automatiškai rodome pagrindinį turinį be prisijungimo formos.
+  checkExistingSession();
 });
+
+// ============================================================
+// SESIJOS TIKRINIMAS PUSLAPIO KROVIMO METU
+// Jei naršyklėje yra galiojanti JWT cookie – vartotojas jau prisijungęs.
+// ============================================================
+async function checkExistingSession() {
+  try {
+    // Kviečiame GET /api/auth/me – serveris patikrina cookie
+    const data = await API.checkSession();
+    // Jei pavyko – vartotojas vis dar prisijungęs, rodome pagrindinį turinį
+    showMainContent(data.username);
+  } catch (error) {
+    // Jei klaida (401) – cookie nėra arba pasibaigusi, rodome prisijungimo formą
+    // Nieko nedarome – forma jau matoma pagal nutylėjimą
+  }
+}
 
 // ============================================================
 // FORMOS PATEIKIMO APDOROJIMAS

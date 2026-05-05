@@ -23,8 +23,10 @@ const jwt = require('jsonwebtoken');
 // pool.query() leidžia vykdyti SQL užklausas duomenų bazėje.
 const { pool } = require('../data/store');
 
-// Importuojame slaptą raktą iš auth middleware – jis naudojamas JWT pasirašymui.
-const { SECRET } = require('../middleware/auth');
+// Importuojame slaptą raktą ir middleware iš auth middleware failo.
+// SECRET – naudojamas JWT pasirašymui.
+// authMiddleware – naudojamas /me endpoint'e sesijos tikrinimui.
+const { SECRET, authMiddleware } = require('../middleware/auth');
 
 // ============================================================
 // POST /api/auth/register
@@ -176,6 +178,19 @@ router.post('/logout', (req, res) => {
 
   // Grąžiname patvirtinimą, kad atsijungimas sėkmingas.
   res.json({ message: 'Atsijungimas sėkmingas!' });
+});
+// ============================================================
+// GET /api/auth/me
+// Tikrina ar vartotojas vis dar prisijungęs (ar cookie galioja).
+// Naudojama puslapio krovimo metu – jei sesija aktyvi, nereikia
+// vėl prisijungti. Naudoja authMiddleware tokeno tikrinimui.
+// ============================================================
+
+
+router.get('/me', authMiddleware, (req, res) => {
+  // Jei authMiddleware praleido – tokenas galioja.
+  // req.user buvo nustatytas middleware (dekoduotas iš JWT).
+  res.json({ username: req.user.username });
 });
 
 // Eksportuojame router, kad server.js galėtų jį prijungti prie aplikacijos.
